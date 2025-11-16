@@ -9,6 +9,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TimelinePage from './pages/TimelinePage';
+import ComparePage from './pages/ComparePage';
 import PricingPage from './pages/PricingPage';
 import AccountPage from './pages/AccountPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
@@ -16,6 +17,7 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 // Components
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import InstallPrompt from './components/InstallPrompt';
 
 function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -39,6 +41,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <TimelinePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/compare"
+            element={
+              <ProtectedRoute>
+                <ComparePage />
               </ProtectedRoute>
             }
           />
@@ -71,6 +81,7 @@ function App() {
           pauseOnHover
           theme="colored"
         />
+        <InstallPrompt />
       </div>
     </Router>
   );

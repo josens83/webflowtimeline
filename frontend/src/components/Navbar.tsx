@@ -28,6 +28,12 @@ export default function Navbar() {
               타임라인
             </Link>
             <Link
+              to="/compare"
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition"
+            >
+              비교 분석
+            </Link>
+            <Link
               to="/pricing"
               className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition"
             >
@@ -91,6 +97,13 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               타임라인
+            </Link>
+            <Link
+              to="/compare"
+              className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              비교 분석
             </Link>
             <Link
               to="/pricing"

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { trendsAPI } from '../services/api';
 import { TrendData, Decade, Country } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Globe, Code, Users, TrendingUp } from 'lucide-react';
+import { Lock, Globe, Code, Users, TrendingUp, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/useAuthStore';
 import { Link } from 'react-router-dom';
+import ExportButton from '../components/ExportButton';
 
 const DECADES: { value: Decade; label: string; color: string }[] = [
   { value: '1990s', label: '1990년대', color: 'from-blue-500 to-cyan-500' },
@@ -23,8 +24,10 @@ const COUNTRIES: { value: Country; label: string; flag: string }[] = [
 
 export default function TimelinePage() {
   const [trends, setTrends] = useState<TrendData[]>([]);
+  const [filteredTrends, setFilteredTrends] = useState<TrendData[]>([]);
   const [selectedDecade, setSelectedDecade] = useState<Decade>('2020s');
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
 
@@ -33,6 +36,10 @@ export default function TimelinePage() {
   useEffect(() => {
     loadTrends();
   }, [selectedDecade, selectedCountry]);
+
+  useEffect(() => {
+    filterTrends();
+  }, [trends, searchQuery]);
 
   const loadTrends = async () => {
     setIsLoading(true);
@@ -49,6 +56,26 @@ export default function TimelinePage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const filterTrends = () => {
+    if (!searchQuery.trim()) {
+      setFilteredTrends(trends);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const filtered = trends.filter(trend => {
+      return (
+        trend.title.toLowerCase().includes(query) ||
+        trend.description.toLowerCase().includes(query) ||
+        trend.websites.some(site => site.name.toLowerCase().includes(query)) ||
+        trend.design_trends.some(dt => dt.toLowerCase().includes(query)) ||
+        trend.tech_stack.some(tech => tech.toLowerCase().includes(query))
+      );
+    });
+
+    setFilteredTrends(filtered);
   };
 
   const handleCountryFilter = (country: Country) => {
@@ -68,6 +95,21 @@ export default function TimelinePage() {
           <p className="text-xl text-gray-600 dark:text-gray-400">
             1990년대부터 2020년대까지 웹의 진화를 탐색하세요
           </p>
+        </div>
+
+        {/* Search and Export */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-between">
+          <div className="relative flex-1 w-full md:max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="웹사이트, 기술, 트렌드 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+            />
+          </div>
+          <ExportButton data={filteredTrends} filename="web-trends-timeline" />
         </div>
 
         {/* Decade Selector */}
@@ -128,7 +170,7 @@ export default function TimelinePage() {
               transition={{ duration: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
-              {trends.map((trend, index) => (
+              {filteredTrends.map((trend, index) => (
                 <TrendCard
                   key={trend.id}
                   trend={trend}
@@ -140,11 +182,19 @@ export default function TimelinePage() {
           </AnimatePresence>
         )}
 
-        {trends.length === 0 && !isLoading && (
+        {filteredTrends.length === 0 && !isLoading && (
           <div className="text-center py-20">
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              해당 조건의 데이터가 없습니다
+              {searchQuery ? '검색 결과가 없습니다' : '해당 조건의 데이터가 없습니다'}
             </p>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="mt-4 text-primary-600 hover:underline"
+              >
+                검색 초기화
+              </button>
+            )}
           </div>
         )}
       </div>
