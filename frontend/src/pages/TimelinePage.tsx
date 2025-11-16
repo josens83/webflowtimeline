@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/useAuthStore';
 import { Link } from 'react-router-dom';
 import ExportButton from '../components/ExportButton';
+import ShareButton from '../components/ShareButton';
+import TimelineChart from '../components/TimelineChart';
 
 const DECADES: { value: Decade; label: string; color: string }[] = [
   { value: '1990s', label: '1990년대', color: 'from-blue-500 to-cyan-500' },
@@ -155,6 +157,13 @@ export default function TimelinePage() {
           </div>
         </div>
 
+        {/* Timeline Chart */}
+        {!isLoading && filteredTrends.length > 0 && !searchQuery && (
+          <div className="mb-8">
+            <TimelineChart trends={filteredTrends} />
+          </div>
+        )}
+
         {/* Trends Grid */}
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
@@ -239,7 +248,7 @@ function TrendCard({ trend, index, isPremium }: TrendCardProps) {
       )}
 
       <div className="flex items-start justify-between mb-4">
-        <div>
+        <div className="flex-1">
           <h3 className="text-2xl font-bold mb-1">
             <span className="mr-2">{countryEmoji}</span>
             {trend.title}
@@ -248,9 +257,12 @@ function TrendCard({ trend, index, isPremium }: TrendCardProps) {
             {trend.decade}
           </span>
         </div>
-        {trend.is_premium && (
-          <span className="premium-badge">Premium</span>
-        )}
+        <div className="flex items-center gap-2">
+          {!isLocked && <ShareButton trend={trend} />}
+          {trend.is_premium && (
+            <span className="premium-badge">Premium</span>
+          )}
+        </div>
       </div>
 
       <p className="text-gray-700 dark:text-gray-300 mb-4">
