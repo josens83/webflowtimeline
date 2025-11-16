@@ -10,6 +10,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TimelinePage from './pages/TimelinePage';
 import ComparePage from './pages/ComparePage';
+import BookmarksPage from './pages/BookmarksPage';
+import InsightsPage from './pages/InsightsPage';
 import PricingPage from './pages/PricingPage';
 import AccountPage from './pages/AccountPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
@@ -49,6 +51,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <ComparePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bookmarks"
+            element={
+              <ProtectedRoute>
+                <BookmarksPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/insights"
+            element={
+              <ProtectedRoute>
+                <InsightsPage />
               </ProtectedRoute>
             }
           />

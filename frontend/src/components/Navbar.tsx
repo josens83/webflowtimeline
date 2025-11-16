@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
-import { Crown, LogOut, User, Menu, X } from 'lucide-react';
+import { Crown, LogOut, User, Menu, X, BookmarkPlus, Activity } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Navbar() {
@@ -33,6 +33,24 @@ export default function Navbar() {
             >
               비교 분석
             </Link>
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/insights"
+                  className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition"
+                >
+                  <Activity className="w-4 h-4 mr-1" />
+                  인사이트
+                </Link>
+                <Link
+                  to="/bookmarks"
+                  className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition"
+                >
+                  <BookmarkPlus className="w-4 h-4 mr-1" />
+                  북마크
+                </Link>
+              </>
+            )}
             <Link
               to="/pricing"
               className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition"
@@ -105,6 +123,26 @@ export default function Navbar() {
             >
               비교 분석
             </Link>
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/insights"
+                  className="flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Activity className="w-4 h-4 mr-2" />
+                  인사이트
+                </Link>
+                <Link
+                  to="/bookmarks"
+                  className="flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <BookmarkPlus className="w-4 h-4 mr-2" />
+                  북마크
+                </Link>
+              </>
+            )}
             <Link
               to="/pricing"
               className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
