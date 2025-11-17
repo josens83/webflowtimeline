@@ -25,14 +25,18 @@ export const register = async (req: Request, res: Response) => {
           return res.status(500).json({ error: 'Registration failed' });
         }
 
+        const jwtSecret: jwt.Secret = process.env.JWT_SECRET || 'secret';
+        const jwtExpiresIn: string | number = process.env.JWT_EXPIRES_IN || '7d';
+
+        // @ts-ignore: TypeScript has issues with jwt.sign overloads
         const token = jwt.sign(
           {
             id: this.lastID,
             email,
             subscription_status: 'free'
           },
-          process.env.JWT_SECRET || 'secret',
-          { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+          jwtSecret,
+          { expiresIn: jwtExpiresIn }
         );
 
         res.status(201).json({
@@ -77,14 +81,18 @@ export const login = async (req: Request, res: Response) => {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      const jwtSecret: jwt.Secret = process.env.JWT_SECRET || 'secret';
+      const jwtExpiresIn: string | number = process.env.JWT_EXPIRES_IN || '7d';
+
+      // @ts-ignore: TypeScript has issues with jwt.sign overloads
       const token = jwt.sign(
         {
           id: user.id,
           email: user.email,
           subscription_status: user.subscription_status
         },
-        process.env.JWT_SECRET || 'secret',
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+        jwtSecret,
+        { expiresIn: jwtExpiresIn }
       );
 
       res.json({

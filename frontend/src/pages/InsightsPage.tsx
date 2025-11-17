@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { trendsAPI } from '../services/api';
-import { TrendData, Decade, Country } from '../types';
+import { TrendData } from '../types';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,

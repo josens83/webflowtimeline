@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendData } from '../types';
 import { exportToPDF, exportToExcel, exportToJSON } from '../utils/exportUtils';
 import { useAuthStore } from '../store/useAuthStore';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 interface ExportButtonProps {

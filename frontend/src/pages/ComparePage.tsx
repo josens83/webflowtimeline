@@ -287,13 +287,14 @@ export default function ComparePage() {
                   <PolarRadiusAxis />
                   {selectedCountries.map((countryValue) => {
                     const country = COUNTRIES.find(c => c.value === countryValue);
+                    if (!country) return null;
                     return (
                       <Radar
                         key={countryValue}
-                        name={country?.label}
-                        dataKey={country?.label}
-                        stroke={country?.color}
-                        fill={country?.color}
+                        name={country.label}
+                        dataKey={country.label}
+                        stroke={country.color}
+                        fill={country.color}
                         fillOpacity={0.3}
                       />
                     );

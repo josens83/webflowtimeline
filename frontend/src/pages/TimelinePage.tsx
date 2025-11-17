@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Globe, Code, Users, TrendingUp, Search, FileQuestion } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/useAuthStore';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ExportButton from '../components/ExportButton';
 import ShareButton from '../components/ShareButton';
 import TimelineChart from '../components/TimelineChart';
@@ -34,7 +34,6 @@ export default function TimelinePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
-  const navigate = useNavigate();
 
   const isPremium = user?.subscription_status === 'premium';
 

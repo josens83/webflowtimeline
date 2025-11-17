@@ -32,7 +32,7 @@ export const exportToPDF = (trends: TrendData[], title: string = '웹 트렌드 
 
     // Country and Decade
     doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text(
       `${COUNTRIES[trend.country]} - ${trend.decade}`,
       14,
@@ -42,7 +42,7 @@ export const exportToPDF = (trends: TrendData[], title: string = '웹 트렌드 
 
     // Title
     doc.setFontSize(14);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text(trend.title, 14, yPosition);
     yPosition += 8;
 
@@ -55,7 +55,7 @@ export const exportToPDF = (trends: TrendData[], title: string = '웹 트렌드 
     // Websites Table
     if (trend.websites.length > 0) {
       doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('주요 웹사이트:', 14, yPosition);
       yPosition += 5;
 
@@ -81,12 +81,12 @@ export const exportToPDF = (trends: TrendData[], title: string = '웹 트렌드 
     // Design Trends
     if (trend.design_trends.length > 0 && yPosition < 260) {
       doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('디자인 트렌드:', 14, yPosition);
       yPosition += 5;
 
       doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(trend.design_trends.join(', '), 14, yPosition);
       yPosition += 8;
     }
@@ -94,12 +94,12 @@ export const exportToPDF = (trends: TrendData[], title: string = '웹 트렌드 
     // Tech Stack
     if (trend.tech_stack.length > 0 && yPosition < 260) {
       doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('기술 스택:', 14, yPosition);
       yPosition += 5;
 
       doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(trend.tech_stack.join(', '), 14, yPosition);
       yPosition += 10;
     }
