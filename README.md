@@ -29,6 +29,14 @@ Web Trends Timeline은 웹 역사를 인터랙티브하게 탐색하고, 국가�
 - 🔗 **소셜 공유 기능** (Twitter, Facebook, 링크 복사)
 - 📉 **시각화 차트** (국가별/시대별 트렌드 라인차트)
 
+### 🎨 프로페셔널 UX/UI
+- ⚡ **로딩 스켈레톤** - 페이지별 맞춤형 로딩 애니메이션 (8가지)
+- 🛡️ **에러 처리** - 자동 에러 캐칭 및 복구 UI (ErrorBoundary)
+- 📭 **빈 상태 UI** - 표준화된 빈 상태 및 가이드
+- 🎓 **사용자 온보딩** - 첫 방문자를 위한 6단계 인터랙티브 가이드
+- 🌙 **다크 모드** - 시스템 설정 연동 자동 전환
+- ✨ **애니메이션** - Framer Motion 기반 부드러운 전환
+
 ## 🏗️ 기술 스택
 
 ### Frontend
@@ -64,6 +72,10 @@ webflowtimeline/
 ├── frontend/                   # React 프론트엔드
 │   ├── src/
 │   │   ├── components/        # 재사용 컴포넌트
+│   │   │   ├── ErrorBoundary.tsx    # 에러 캐칭 & 복구
+│   │   │   ├── LoadingSkeleton.tsx  # 로딩 스켈레톤 (8종)
+│   │   │   ├── EmptyState.tsx       # 빈 상태 UI
+│   │   │   ├── OnboardingTour.tsx   # 사용자 온보딩
 │   │   │   ├── ExportButton.tsx
 │   │   │   ├── ShareButton.tsx
 │   │   │   ├── TimelineChart.tsx
@@ -74,6 +86,9 @@ webflowtimeline/
 │   │   │   ├── ComparePage.tsx
 │   │   │   ├── BookmarksPage.tsx
 │   │   │   ├── InsightsPage.tsx
+│   │   │   ├── LandingPage.tsx
+│   │   │   ├── PricingPage.tsx
+│   │   │   ├── AccountPage.tsx
 │   │   │   └── ...
 │   │   ├── services/          # API 서비스
 │   │   ├── store/             # Zustand 스토어
@@ -82,7 +97,8 @@ webflowtimeline/
 │   ├── public/
 │   │   ├── icons/             # PWA 아이콘
 │   │   ├── manifest.json      # PWA 매니페스트
-│   │   └── sw.js              # Service Worker
+│   │   ├── sw.js              # Service Worker
+│   │   └── robots.txt         # SEO
 │   └── package.json
 ├── backend/                    # Express 백엔드
 │   ├── src/
@@ -375,35 +391,63 @@ npm run dev  # 자동으로 재생성됨
 - Stripe 대시보드에서 Webhook 엔드포인트 확인
 - 테스트 모드 키 사용 중인지 확인
 
-## 📈 로드맵
+## 📈 개발 로드맵
 
 ### Phase 1 ✅ (완료)
-- [x] 기본 인증 시스템
+- [x] 기본 인증 시스템 (JWT)
 - [x] 타임라인 뷰
 - [x] Stripe 결제 통합
 - [x] 프리미엄/무료 티어 구분
 
 ### Phase 2 ✅ (완료)
-- [x] PWA 구현
-- [x] 비교 분석 도구
+- [x] PWA 구현 (Service Worker, Manifest)
+- [x] 비교 분석 도구 (Bar, Radar, Line 차트)
 - [x] 내보내기 기능 (PDF, Excel, JSON)
 - [x] 고급 검색 및 필터링
 
 ### Phase 3 ✅ (완료)
-- [x] 전체 데이터 완성 (16개 트렌드)
-- [x] 소셜 공유 기능
-- [x] 시각화 차트
+- [x] 전체 데이터 완성 (16개 트렌드, 4개국, 4시대)
+- [x] 소셜 공유 기능 (Twitter, Facebook, 링크 복사)
+- [x] 시각화 차트 (Timeline Chart)
 - [x] 북마크 시스템
 
 ### Phase 4 ✅ (완료)
 - [x] 북마크 관리 페이지
-- [x] 인사이트 대시보드
-- [x] PWA 아이콘 생성
+- [x] 인사이트 대시보드 (종합 분석 & 통계)
+- [x] PWA 아이콘 생성 (8가지 크기)
 - [x] 문서화 완성
 
-### Phase 5 🔮 (예정)
-- [ ] 관리자 대시보드
-- [ ] 사용자 활동 분석
+### Phase 5 ✅ (완료) - 프로덕션 런칭 준비
+- [x] SEO 최적화 (robots.txt, meta tags)
+- [x] 법률 페이지 (이용약관, 개인정보처리방침, 환불정책)
+- [x] 문의 페이지
+- [x] FAQ 페이지
+- [x] Docker 배포 설정
+- [x] Nginx 리버스 프록시 설정
+
+### Phase 6 ✅ (완료) - UX 완성도 & 사용자 온보딩
+- [x] ErrorBoundary (에러 캐칭 & 복구 UI)
+- [x] LoadingSkeleton (8가지 스켈레톤 컴포넌트)
+- [x] EmptyState (표준화된 빈 상태 UI)
+- [x] OnboardingTour (6단계 사용자 가이드)
+- [x] 다크 모드 지원
+
+### Phase 7 ✅ (완료) - UX 컴포넌트 통합
+- [x] TimelinePage에 Skeleton & EmptyState 적용
+- [x] InsightsPage에 Skeleton 적용
+- [x] ComparePage에 Skeleton 적용
+- [x] BookmarksPage에 EmptyState 적용
+- [x] 전체 페이지 UX 일관성 확보
+
+### 🚀 프로덕션 준비 완료!
+
+현재 서비스는 **상용 유료 서비스 수준으로 개발 완료**되었습니다.
+
+### Phase 8+ 🔮 (선택적 향후 개선사항)
+- [ ] Google Analytics 통합
+- [ ] Sentry 에러 모니터링
+- [ ] 이메일 알림 시스템 (환영 메일, 구독 확인)
+- [ ] 관리자 대시보드 (사용자/구독 관리)
 - [ ] 다국어 지원 (영어, 일본어, 중국어)
 - [ ] REST API 공개 (프리미엄)
 - [ ] 커뮤니티 기능 (댓글, 평가)
