@@ -15,9 +15,16 @@ import InsightsPage from './pages/InsightsPage';
 import PricingPage from './pages/PricingPage';
 import AccountPage from './pages/AccountPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import FAQPage from './pages/FAQPage';
+import ContactPage from './pages/ContactPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 // Components
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import InstallPrompt from './components/InstallPrompt';
 
@@ -38,6 +45,14 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 
+          {/* Legal & Support Pages */}
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/refund" element={<RefundPolicyPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+
+          {/* Protected Routes */}
           <Route
             path="/timeline"
             element={
@@ -86,7 +101,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* 404 - Must be last */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <Footer />
         <ToastContainer
           position="top-right"
           autoClose={3000}

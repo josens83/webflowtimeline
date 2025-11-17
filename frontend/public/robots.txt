@@ -1,0 +1,37 @@
+# robots.txt for Web Trends Timeline
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /account
+Disallow: /payment/
+
+# Sitemap location
+Sitemap: https://webtrends.com/sitemap.xml
+
+# Crawl-delay (optional, to prevent overwhelming the server)
+Crawl-delay: 10
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /account
+Disallow: /payment/
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /account
+Disallow: /payment/
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+# Allow good crawlers
+User-agent: GPTBot
+Allow: /

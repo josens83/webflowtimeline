@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://webtrends:webtrends_password@db:5432/webtrends
+      - JWT_SECRET=${JWT_SECRET}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - PORT=3001
+    depends_on:
+      - db
+    networks:
+      - webtrends-network
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=webtrends
+      - POSTGRES_PASSWORD=webtrends_password
+      - POSTGRES_DB=webtrends
+    ports:
+      - "5432:5432"
+    networks:
+      - webtrends-network
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Nginx (for serving frontend in production)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - webtrends-network
+    restart: unless-stopped
+
+networks:
+  webtrends-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
