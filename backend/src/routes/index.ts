@@ -12,6 +12,7 @@ import {
   webhookHandler
 } from '../controllers/stripeController';
 import { authenticateToken, requirePremium } from '../middleware/auth';
+import adminRoutes from './admin';
 
 const router = express.Router();
 
@@ -30,5 +31,8 @@ router.get('/trends/compare', authenticateToken, requirePremium, compareTrends);
 router.post('/stripe/create-checkout-session', authenticateToken, createCheckoutSession);
 router.post('/stripe/create-portal-session', authenticateToken, createPortalSession);
 router.post('/stripe/webhook', express.raw({ type: 'application/json' }), webhookHandler);
+
+// Admin routes
+router.use('/admin', adminRoutes);
 
 export default router;
