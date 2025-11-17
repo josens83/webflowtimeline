@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ExportButton from '../components/ExportButton';
+import { InsightsPageSkeleton } from '../components/LoadingSkeleton';
 
 const COUNTRY_COLORS: { [key: string]: string } = {
   korea: '#3b82f6',
@@ -118,11 +119,7 @@ export default function InsightsPage() {
     .map(([name, value]) => ({ name, value }));
 
   if (isLoading) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <InsightsPageSkeleton />;
   }
 
   return (

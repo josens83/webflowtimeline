@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react';
 import { trendsAPI } from '../services/api';
 import { TrendData, Decade, Country } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Globe, Code, Users, TrendingUp, Search } from 'lucide-react';
+import { Lock, Globe, Code, Users, TrendingUp, Search, FileQuestion } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/useAuthStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ExportButton from '../components/ExportButton';
 import ShareButton from '../components/ShareButton';
 import TimelineChart from '../components/TimelineChart';
+import { TimelinePageSkeleton } from '../components/LoadingSkeleton';
+import EmptyState from '../components/EmptyState';
 
 const DECADES: { value: Decade; label: string; color: string }[] = [
   { value: '1990s', label: '1990년대', color: 'from-blue-500 to-cyan-500' },
@@ -32,6 +34,7 @@ export default function TimelinePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   const isPremium = user?.subscription_status === 'premium';
 
@@ -166,9 +169,7 @@ export default function TimelinePage() {
 
         {/* Trends Grid */}
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600"></div>
-          </div>
+          <TimelinePageSkeleton />
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
@@ -192,19 +193,32 @@ export default function TimelinePage() {
         )}
 
         {filteredTrends.length === 0 && !isLoading && (
-          <div className="text-center py-20">
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              {searchQuery ? '검색 결과가 없습니다' : '해당 조건의 데이터가 없습니다'}
-            </p>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="mt-4 text-primary-600 hover:underline"
-              >
-                검색 초기화
-              </button>
-            )}
-          </div>
+          <EmptyState
+            icon={searchQuery ? Search : FileQuestion}
+            title={searchQuery ? '검색 결과가 없습니다' : '데이터가 없습니다'}
+            description={
+              searchQuery
+                ? '다른 키워드로 검색하거나 필터를 변경해보세요.'
+                : '해당 조건의 트렌드 데이터가 없습니다. 다른 시대나 국가를 선택해보세요.'
+            }
+            action={
+              searchQuery
+                ? {
+                    label: '검색 초기화',
+                    onClick: () => setSearchQuery(''),
+                    variant: 'secondary' as const
+                  }
+                : {
+                    label: '전체 타임라인 보기',
+                    onClick: () => {
+                      setSearchQuery('');
+                      setSelectedCountry(null);
+                      setSelectedDecade('2020s');
+                    },
+                    variant: 'primary' as const
+                  }
+            }
+          />
         )}
       </div>
     </div>

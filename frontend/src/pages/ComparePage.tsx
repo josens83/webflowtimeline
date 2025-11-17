@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { Lock, Globe, Code, TrendingUp } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ExportButton from '../components/ExportButton';
+import { ComparePageSkeleton } from '../components/LoadingSkeleton';
 
 const DECADES: Decade[] = ['1990s', '2000s', '2010s', '2020s'];
 const COUNTRIES: { value: Country; label: string; flag: string; color: string }[] = [
@@ -196,11 +197,7 @@ export default function ComparePage() {
         </div>
 
         {/* Loading */}
-        {isLoading && (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600"></div>
-          </div>
-        )}
+        {isLoading && <ComparePageSkeleton />}
 
         {/* Charts */}
         {!isLoading && comparisonData.length > 0 && (

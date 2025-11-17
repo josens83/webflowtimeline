@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { BookmarkPlus, Trash2, Calendar, MapPin, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import EmptyState from '../components/EmptyState';
 
 interface Bookmark {
   id: number;
@@ -28,6 +29,7 @@ const COUNTRY_LABELS: { [key: string]: string } = {
 
 export default function BookmarksPage() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadBookmarks();
@@ -99,20 +101,16 @@ export default function BookmarksPage() {
 
         {/* Empty State */}
         {bookmarks.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20"
-          >
-            <BookmarkPlus className="w-20 h-20 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold mb-4">북마크가 없습니다</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-              관심있는 웹 트렌드를 북마크하여 나중에 쉽게 찾아보세요
-            </p>
-            <Link to="/timeline" className="btn-primary inline-block">
-              타임라인 탐색하기
-            </Link>
-          </motion.div>
+          <EmptyState
+            icon={BookmarkPlus}
+            title="북마크가 없습니다"
+            description="관심있는 웹 트렌드를 북마크하여 나중에 쉽게 찾아보세요. 타임라인에서 마음에 드는 트렌드를 저장할 수 있습니다."
+            action={{
+              label: '타임라인 탐색하기',
+              onClick: () => navigate('/timeline'),
+              variant: 'primary'
+            }}
+          />
         )}
 
         {/* Bookmarks by Decade */}
