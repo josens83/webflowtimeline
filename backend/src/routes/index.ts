@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, getProfile } from '../controllers/authController';
+import { register, login, getProfile, updateProfile, changePassword } from '../controllers/authController';
 import {
   getAllTrends,
   getTrendsByDecade,
@@ -11,6 +11,14 @@ import {
   createPortalSession,
   webhookHandler
 } from '../controllers/stripeController';
+import {
+  submitContact,
+  getAllContacts,
+  getContact,
+  updateContactStatus,
+  deleteContact,
+  getContactStats
+} from '../controllers/contactController';
 import { authenticateToken, requirePremium } from '../middleware/auth';
 import adminRoutes from './admin';
 
@@ -20,6 +28,8 @@ const router = express.Router();
 router.post('/auth/register', register);
 router.post('/auth/login', login);
 router.get('/auth/profile', authenticateToken, getProfile);
+router.put('/auth/profile', authenticateToken, updateProfile);
+router.put('/auth/password', authenticateToken, changePassword);
 
 // Trends routes (some require authentication for premium features)
 router.get('/trends', authenticateToken, getAllTrends);
@@ -31,6 +41,9 @@ router.get('/trends/compare', authenticateToken, requirePremium, compareTrends);
 router.post('/stripe/create-checkout-session', authenticateToken, createCheckoutSession);
 router.post('/stripe/create-portal-session', authenticateToken, createPortalSession);
 router.post('/stripe/webhook', express.raw({ type: 'application/json' }), webhookHandler);
+
+// Contact routes
+router.post('/contact', submitContact); // Public endpoint (can be used by non-logged-in users)
 
 // Admin routes
 router.use('/admin', adminRoutes);

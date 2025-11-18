@@ -46,6 +46,23 @@ function initDatabase() {
     )
   `);
 
+  // Contacts table for customer inquiries
+  db.run(`
+    CREATE TABLE IF NOT EXISTS contacts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      message TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      user_id INTEGER,
+      admin_reply TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
   console.log('Database tables initialized');
 }
 

@@ -28,6 +28,12 @@ export const authAPI = {
 
   getProfile: () =>
     api.get('/auth/profile'),
+
+  updateProfile: (data: { name?: string; email?: string }) =>
+    api.put('/auth/profile', data),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put('/auth/password', { currentPassword, newPassword }),
 };
 
 // Trends APIs
@@ -54,6 +60,34 @@ export const stripeAPI = {
 
   createPortalSession: () =>
     api.post('/stripe/create-portal-session'),
+};
+
+// Contact APIs
+export const contactAPI = {
+  submit: (data: { name: string; email: string; subject: string; message: string }) =>
+    api.post('/contact', data),
+};
+
+// Admin APIs
+export const adminAPI = {
+  // Users
+  getUsers: () => api.get('/admin/users'),
+  getStats: () => api.get('/admin/stats'),
+  updateSubscription: (userId: number, subscription_status: string) =>
+    api.put(`/admin/users/${userId}/subscription`, { subscription_status }),
+  deleteUser: (userId: number) => api.delete(`/admin/users/${userId}`),
+
+  // System
+  getSystemInfo: () => api.get('/admin/system'),
+
+  // Contacts
+  getContacts: (params?: { status?: string; limit?: number; offset?: number }) =>
+    api.get('/admin/contacts', { params }),
+  getContactStats: () => api.get('/admin/contacts/stats'),
+  getContact: (id: number) => api.get(`/admin/contacts/${id}`),
+  updateContact: (id: number, data: { status: string; admin_reply?: string }) =>
+    api.put(`/admin/contacts/${id}`, data),
+  deleteContact: (id: number) => api.delete(`/admin/contacts/${id}`),
 };
 
 export default api;

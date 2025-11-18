@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Clock, MapPin, Send, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { contactAPI } from '../services/api';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -17,18 +18,22 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      await contactAPI.submit(formData);
+      setIsSubmitted(true);
+      toast.success('문의가 성공적으로 전송되었습니다!');
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success('문의가 성공적으로 전송되었습니다!');
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setIsSubmitted(false);
-    }, 3000);
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setIsSubmitted(false);
+      }, 3000);
+    } catch (error: any) {
+      console.error('Contact submission error:', error);
+      toast.error(error.response?.data?.error || '문의 전송에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

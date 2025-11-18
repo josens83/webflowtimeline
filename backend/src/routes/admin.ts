@@ -2,6 +2,13 @@ import { Router, Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import db from '../config/database';
 import { User } from '../types';
+import {
+  getAllContacts,
+  getContact,
+  updateContactStatus,
+  deleteContact,
+  getContactStats
+} from '../controllers/contactController';
 
 const router = Router();
 
@@ -136,5 +143,12 @@ router.get('/system', authenticateToken, isAdmin, (req: AuthRequest, res: Respon
 
   res.json(info);
 });
+
+// Contact management routes (admin only)
+router.get('/contacts', authenticateToken, isAdmin, getAllContacts);
+router.get('/contacts/stats', authenticateToken, isAdmin, getContactStats);
+router.get('/contacts/:id', authenticateToken, isAdmin, getContact);
+router.put('/contacts/:id', authenticateToken, isAdmin, updateContactStatus);
+router.delete('/contacts/:id', authenticateToken, isAdmin, deleteContact);
 
 export default router;

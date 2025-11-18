@@ -14,6 +14,7 @@ import BookmarksPage from './pages/BookmarksPage';
 import InsightsPage from './pages/InsightsPage';
 import PricingPage from './pages/PricingPage';
 import AccountPage from './pages/AccountPage';
+import AdminPage from './pages/AdminPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
@@ -104,6 +105,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AccountPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
                 </ProtectedRoute>
               }
             />
