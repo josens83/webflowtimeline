@@ -1,35 +1,36 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 
-// Pages
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import TimelinePage from './pages/TimelinePage';
-import ComparePage from './pages/ComparePage';
-import BookmarksPage from './pages/BookmarksPage';
-import InsightsPage from './pages/InsightsPage';
-import PricingPage from './pages/PricingPage';
-import AccountPage from './pages/AccountPage';
-import AdminPage from './pages/AdminPage';
-import PaymentSuccessPage from './pages/PaymentSuccessPage';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import TermsOfServicePage from './pages/TermsOfServicePage';
-import RefundPolicyPage from './pages/RefundPolicyPage';
-import FAQPage from './pages/FAQPage';
-import ContactPage from './pages/ContactPage';
-import NotFoundPage from './pages/NotFoundPage';
-
-// Components
+// Components (Eager-loaded - Always visible)
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import InstallPrompt from './components/InstallPrompt';
 import ErrorBoundary from './components/ErrorBoundary';
 import OnboardingTour, { useOnboarding } from './components/OnboardingTour';
+import { LoadingFallback } from './components/molecules/LoadingFallback';
+
+// Pages (Lazy-loaded - Code splitting)
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const TimelinePage = lazy(() => import('./pages/TimelinePage'));
+const ComparePage = lazy(() => import('./pages/ComparePage'));
+const BookmarksPage = lazy(() => import('./pages/BookmarksPage'));
+const InsightsPage = lazy(() => import('./pages/InsightsPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+const RefundPolicyPage = lazy(() => import('./pages/RefundPolicyPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -54,7 +55,8 @@ function App() {
             />
           )}
 
-          <Routes>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -125,9 +127,10 @@ function App() {
               }
             />
 
-            {/* 404 - Must be last */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+              {/* 404 - Must be last */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
 
           <Footer />
 

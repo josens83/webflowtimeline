@@ -7,19 +7,24 @@ import { toast } from 'react-toastify';
  * Axios 에러를 사용자 친화적인 메시지로 변환
  */
 export function handleApiError(error: unknown): string {
-  if (error instanceof AxiosError) {
+  // Axios error check - instance check and isAxiosError property
+  const isAxios = error instanceof AxiosError || (error as any)?.isAxiosError === true;
+
+  if (isAxios) {
+    const axiosError = error as AxiosError;
+
     // 네트워크 에러
-    if (!error.response) {
+    if (!axiosError.response) {
       return '네트워크 연결을 확인해주세요.';
     }
 
-    const apiError = error.response.data as ApiError;
+    const apiError = axiosError.response.data as ApiError;
 
     // API 에러 메시지 우선순위: error > message > 기본 메시지
     return (
       apiError.error ||
       apiError.message ||
-      getStatusMessage(error.response.status)
+      getStatusMessage(axiosError.response.status)
     );
   }
 
@@ -30,7 +35,7 @@ export function handleApiError(error: unknown): string {
 /**
  * HTTP 상태 코드별 기본 메시지
  */
-function getStatusMessage(status: number): string {
+export function getStatusMessage(status: number): string {
   const messages: Record<number, string> = {
     400: '잘못된 요청입니다.',
     401: '인증이 필요합니다. 다시 로그인해주세요.',
@@ -72,9 +77,8 @@ export function showInfoToast(message: string): void {
  * 에러가 401 (Unauthorized)인지 확인
  */
 export function isUnauthorizedError(error: unknown): boolean {
-  return (
-    error instanceof AxiosError && error.response?.status === 401
-  );
+  const isAxios = error instanceof AxiosError || (error as any)?.isAxiosError === true;
+  return isAxios && (error as AxiosError).response?.status === 401;
 }
 
 /**

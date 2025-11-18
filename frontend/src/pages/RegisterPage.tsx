@@ -2,16 +2,19 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { UserPlus } from 'lucide-react';
+import { Button } from '../components/atoms/Button';
+import { FormField } from '../components/molecules/FormField';
+import { Card } from '../components/molecules/Card';
+import { Alert } from '../components/molecules/Alert';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const register = useAuthStore((state) => state.register);
+  const { register, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,22 +31,18 @@ export default function RegisterPage() {
       return;
     }
 
-    setIsLoading(true);
-
     try {
       await register(email, password, name);
       navigate('/timeline');
     } catch (error) {
       // Error handling is done in the store
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
-        <div className="card">
+        <Card variant="elevated" padding="lg">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full mb-4">
               <UserPlus className="w-8 h-8 text-primary-600 dark:text-primary-400" />
@@ -55,79 +54,63 @@ export default function RegisterPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-lg">
+            <Alert variant="error" className="mb-6" closable onClose={() => setError('')}>
               {error}
-            </div>
+            </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-2">
-                이름
-              </label>
-              <input
-                id="name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                placeholder="홍길동"
-              />
-            </div>
+            <FormField
+              label="이름"
+              id="name"
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="홍길동"
+            />
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">
-                이메일
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                placeholder="your@email.com"
-              />
-            </div>
+            <FormField
+              label="이메일"
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+            />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
-                비밀번호
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                placeholder="••••••••"
-              />
-            </div>
+            <FormField
+              label="비밀번호"
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              helperText="최소 6자 이상"
+            />
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
-                비밀번호 확인
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                placeholder="••••••••"
-              />
-            </div>
+            <FormField
+              label="비밀번호 확인"
+              id="confirmPassword"
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+            />
 
-            <button
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="primary"
+              size="lg"
+              fullWidth
+              isLoading={isLoading}
+              loadingText="가입 중..."
             >
-              {isLoading ? '가입 중...' : '회원가입'}
-            </button>
+              회원가입
+            </Button>
           </form>
 
           <div className="mt-6 text-center">
@@ -138,7 +121,7 @@ export default function RegisterPage() {
               </Link>
             </p>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
