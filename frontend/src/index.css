@@ -2,45 +2,372 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ================================
+   Design Tokens - Modern Design System
+   ================================ */
 @layer base {
+  :root {
+    /* Semantic Colors - Light Mode */
+    --color-bg-base: 255 255 255;
+    --color-bg-subtle: 249 250 251;
+    --color-bg-muted: 243 244 246;
+
+    --color-surface: 255 255 255;
+    --color-surface-hover: 249 250 251;
+    --color-surface-elevated: 255 255 255;
+
+    --color-text-primary: 17 24 39;
+    --color-text-secondary: 75 85 99;
+    --color-text-tertiary: 156 163 175;
+    --color-text-inverse: 255 255 255;
+
+    --color-border-subtle: 229 231 235;
+    --color-border-default: 209 213 219;
+    --color-border-strong: 156 163 175;
+
+    /* Brand Colors */
+    --color-primary: 99 102 241;
+    --color-primary-hover: 79 70 229;
+    --color-primary-subtle: 238 242 255;
+
+    --color-accent: 236 72 153;
+    --color-accent-hover: 219 39 119;
+
+    --color-success: 34 197 94;
+    --color-warning: 251 146 60;
+    --color-error: 239 68 68;
+
+    /* Effects */
+    --blur-sm: 4px;
+    --blur-md: 8px;
+    --blur-lg: 16px;
+    --blur-xl: 24px;
+
+    --shadow-soft: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 20px rgb(99 102 241 / 0.3);
+
+    /* Typography */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+
+    /* Spacing scale */
+    --spacing-unit: 0.25rem;
+  }
+
+  /* Dark Mode - Linear/Stripe inspired */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg-base: 10 10 10;
+      --color-bg-subtle: 20 20 20;
+      --color-bg-muted: 30 30 30;
+
+      --color-surface: 24 24 27;
+      --color-surface-hover: 39 39 42;
+      --color-surface-elevated: 39 39 42;
+
+      --color-text-primary: 250 250 250;
+      --color-text-secondary: 161 161 170;
+      --color-text-tertiary: 113 113 122;
+      --color-text-inverse: 10 10 10;
+
+      --color-border-subtle: 39 39 42;
+      --color-border-default: 63 63 70;
+      --color-border-strong: 113 113 122;
+
+      --color-primary: 129 140 248;
+      --color-primary-hover: 165 180 252;
+      --color-primary-subtle: 30 27 75;
+
+      --shadow-soft: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+      --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+      --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+      --shadow-glow: 0 0 40px rgb(129 140 248 / 0.4);
+    }
+  }
+
+  /* Base styles */
+  * {
+    border-color: rgb(var(--color-border-default));
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @apply bg-gradient-to-br from-bg-base via-bg-subtle to-bg-muted;
+    font-family: var(--font-sans);
+    @apply text-text-primary;
+  }
+
+  /* Custom selection */
+  ::selection {
+    @apply bg-primary/20 text-text-primary;
   }
 }
 
+/* ================================
+   Components - Modern UI Patterns
+   ================================ */
 @layer components {
+  /* Buttons with micro-interactions */
   .btn-primary {
-    @apply px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors duration-200;
+    @apply relative px-6 py-3 font-semibold rounded-lg;
+    @apply bg-primary text-text-inverse;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30;
+    @apply active:translate-y-0;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-semibold rounded-lg transition-colors duration-200;
+    @apply relative px-6 py-3 font-semibold rounded-lg;
+    @apply bg-surface border border-border-default text-text-primary;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:-translate-y-0.5 hover:shadow-md hover:border-border-strong;
+    @apply active:translate-y-0;
   }
 
+  .btn-ghost {
+    @apply px-4 py-2 font-medium rounded-lg;
+    @apply text-text-secondary hover:text-text-primary;
+    @apply hover:bg-surface-hover;
+    @apply transition-all duration-150;
+  }
+
+  /* Glass-morphism cards */
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700;
+    @apply relative rounded-xl p-6;
+    @apply bg-surface/80 backdrop-blur-md;
+    @apply border border-border-subtle;
+    @apply shadow-medium;
+    @apply transition-all duration-300;
   }
 
+  .card-glass {
+    @apply relative rounded-2xl p-6;
+    @apply bg-surface/40 backdrop-blur-xl;
+    @apply border border-border-subtle/50;
+    @apply shadow-large;
+  }
+
+  .card-elevated {
+    @apply card;
+    @apply hover:-translate-y-1 hover:shadow-large;
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Premium gradient badge */
   .premium-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-yellow-400 to-orange-500 text-white;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500;
+    @apply text-white shadow-lg shadow-orange-500/30;
+    @apply animate-pulse;
+  }
+
+  /* Linear-style gradient background */
+  .gradient-radial {
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(99, 102, 241, 0.15) 0%,
+      transparent 50%
+    );
+  }
+
+  .gradient-mesh {
+    background-image:
+      radial-gradient(at 27% 37%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+      radial-gradient(at 97% 21%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+      radial-gradient(at 52% 99%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+      radial-gradient(at 10% 29%, rgba(59, 130, 246, 0.12) 0px, transparent 50%);
+  }
+
+  /* Bento grid container */
+  .bento-grid {
+    @apply grid gap-4 md:gap-6;
+    @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  /* Input fields with modern styling */
+  .input-modern {
+    @apply w-full px-4 py-3 rounded-lg;
+    @apply bg-surface border border-border-default;
+    @apply text-text-primary placeholder:text-text-tertiary;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
+    @apply transition-all duration-200;
+  }
+
+  /* Tooltip with glass effect */
+  .tooltip {
+    @apply absolute z-50 px-3 py-2 rounded-lg text-sm;
+    @apply bg-surface/90 backdrop-blur-md;
+    @apply border border-border-subtle;
+    @apply shadow-large;
+    @apply pointer-events-none;
+  }
+
+  /* Skeleton loader */
+  .skeleton {
+    @apply animate-pulse bg-surface-hover rounded;
+  }
+
+  /* Badge variants */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary/10 text-primary border border-primary/20;
+  }
+
+  .badge-success {
+    @apply badge bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20;
+  }
+
+  .badge-warning {
+    @apply badge bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border-subtle my-6;
+  }
+
+  /* Code block styling */
+  .code-block {
+    @apply px-4 py-3 rounded-lg;
+    @apply bg-bg-muted border border-border-subtle;
+    @apply font-mono text-sm;
+    @apply overflow-x-auto;
   }
 }
 
-/* Scrollbar styles */
+/* ================================
+   Utilities - Micro-interactions
+   ================================ */
+@layer utilities {
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-micro {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-transform duration-200 ease-out;
+    @apply hover:-translate-y-1;
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-bg-base;
+  }
+
+  /* Text shimmer animation */
+  .text-shimmer {
+    @apply bg-gradient-to-r from-text-primary via-primary to-text-primary;
+    @apply bg-clip-text text-transparent;
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  @keyframes shimmer {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+  /* Glow effect */
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  }
+
+  /* Grid pattern background */
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Dot pattern background */
+  .bg-dot-pattern {
+    background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+}
+
+/* ================================
+   Custom Scrollbar - Refined
+   ================================ */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  @apply bg-border-default/50 rounded-full;
+  @apply hover:bg-border-strong/70;
+  @apply transition-colors duration-200;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+/* ================================
+   Animations
+   ================================ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
 }
