@@ -23,6 +23,9 @@ function initDatabase() {
       subscription_status TEXT DEFAULT 'free',
       stripe_customer_id TEXT,
       stripe_subscription_id TEXT,
+      google_id TEXT UNIQUE,
+      kakao_id TEXT UNIQUE,
+      email_verified INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -34,6 +37,13 @@ function initDatabase() {
       db.run('CREATE INDEX IF NOT EXISTS idx_users_subscription ON users(subscription_status)');
       db.run('CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)');
       db.run('CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_users_kakao_id ON users(kakao_id)');
+
+      // Add columns if they don't exist (for existing databases)
+      db.run('ALTER TABLE users ADD COLUMN google_id TEXT', () => {});
+      db.run('ALTER TABLE users ADD COLUMN kakao_id TEXT', () => {});
+      db.run('ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0', () => {});
     }
   });
 

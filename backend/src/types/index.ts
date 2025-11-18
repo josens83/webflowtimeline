@@ -1,3 +1,11 @@
+import { Request } from 'express';
+
+export interface JWTPayload {
+  id: number;
+  email: string;
+  subscription_status: string;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -6,6 +14,9 @@ export interface User {
   subscription_status: 'free' | 'premium';
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
+  google_id?: string;
+  kakao_id?: string;
+  email_verified?: number;
   created_at: string;
   updated_at: string;
 }
@@ -35,15 +46,5 @@ export interface Website {
 }
 
 export interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    subscription_status: string;
-  };
-}
-
-export interface JWTPayload {
-  id: number;
-  email: string;
-  subscription_status: string;
+  user?: JWTPayload;
 }
