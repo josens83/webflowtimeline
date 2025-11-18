@@ -12,6 +12,7 @@ import InstallPrompt from './components/InstallPrompt';
 import ErrorBoundary from './components/ErrorBoundary';
 import OnboardingTour, { useOnboarding } from './components/OnboardingTour';
 import { LoadingFallback } from './components/molecules/LoadingFallback';
+import { CommandPalette, useCommandPalette } from './components/molecules/CommandPalette';
 
 // Pages (Lazy-loaded - Code splitting)
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -36,6 +37,7 @@ function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
   const { isAuthenticated } = useAuthStore();
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
+  const { open: commandPaletteOpen, setOpen: setCommandPaletteOpen } = useCommandPalette();
 
   useEffect(() => {
     checkAuth();
@@ -45,6 +47,14 @@ function App() {
     <ErrorBoundary>
       <Router>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          {/* Skip to main content - Accessibility */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+          >
+            메인 콘텐츠로 건너뛰기
+          </a>
+
           <Navbar />
 
           {/* Onboarding Tour for first-time authenticated users */}
@@ -55,8 +65,9 @@ function App() {
             />
           )}
 
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
+          <main id="main-content">
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -129,8 +140,9 @@ function App() {
 
               {/* 404 - Must be last */}
               <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
+              </Routes>
+            </Suspense>
+          </main>
 
           <Footer />
 
@@ -148,6 +160,9 @@ function App() {
           />
 
           <InstallPrompt />
+
+          {/* Command Palette - ⌘K */}
+          <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} />
         </div>
       </Router>
     </ErrorBoundary>

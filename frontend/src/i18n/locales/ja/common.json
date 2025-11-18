@@ -1,0 +1,44 @@
+{
+  "app": {
+    "title": "ウェブトレンドタイムライン",
+    "description": "30年のウェブ歴史"
+  },
+  "nav": {
+    "home": "ホーム",
+    "timeline": "タイムライン",
+    "compare": "比較",
+    "bookmarks": "ブックマーク",
+    "insights": "インサイト",
+    "pricing": "料金プラン",
+    "account": "アカウント",
+    "login": "ログイン",
+    "register": "新規登録",
+    "logout": "ログアウト"
+  },
+  "actions": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "close": "閉じる",
+    "search": "検索",
+    "export": "エクスポート",
+    "submit": "送信",
+    "back": "戻る",
+    "next": "次へ",
+    "skip": "スキップ"
+  },
+  "status": {
+    "loading": "読み込み中...",
+    "saving": "保存中...",
+    "success": "成功",
+    "error": "エラー",
+    "empty": "データがありません"
+  },
+  "errors": {
+    "generic": "エラーが発生しました",
+    "network": "ネットワークエラー",
+    "notFound": "ページが見つかりません",
+    "unauthorized": "ログインが必要です"
+  }
+}

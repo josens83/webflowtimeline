@@ -1,0 +1,44 @@
+{
+  "app": {
+    "title": "Web Trends Timeline",
+    "description": "30 Years of Web History"
+  },
+  "nav": {
+    "home": "Home",
+    "timeline": "Timeline",
+    "compare": "Compare",
+    "bookmarks": "Bookmarks",
+    "insights": "Insights",
+    "pricing": "Pricing",
+    "account": "Account",
+    "login": "Login",
+    "register": "Sign Up",
+    "logout": "Logout"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "export": "Export",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "success": "Success",
+    "error": "Error",
+    "empty": "No data available"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Network error",
+    "notFound": "Page not found",
+    "unauthorized": "Login required"
+  }
+}

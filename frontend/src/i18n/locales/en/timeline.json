@@ -1,0 +1,23 @@
+{
+  "title": "Web Trends Timeline",
+  "subtitle": "Explore the evolution of web from 1990s to 2020s",
+  "search": {
+    "placeholder": "Search websites, technologies, trends...",
+    "noResults": "No results found",
+    "reset": "Reset search"
+  },
+  "filters": {
+    "decade": "Select decade",
+    "country": "Filter by country"
+  },
+  "decades": {
+    "1990s": "1990s",
+    "2000s": "2000s",
+    "2010s": "2010s",
+    "2020s": "2020s"
+  },
+  "premium": {
+    "locked": "Premium Only",
+    "upgrade": "Upgrade"
+  }
+}

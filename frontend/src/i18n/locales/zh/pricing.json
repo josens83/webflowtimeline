@@ -1,0 +1,21 @@
+{
+  "title": "简单透明的价格",
+  "subtitle": "随时取消，退款保证",
+  "free": {
+    "name": "免费",
+    "price": "¥0",
+    "period": "永久免费",
+    "cta": "免费开始"
+  },
+  "premium": {
+    "name": "高级版",
+    "price": "$9.99",
+    "period": "月",
+    "cta": "开始高级版",
+    "badge": "热门",
+    "current": "当前订阅中"
+  },
+  "faq": {
+    "title": "常见问题"
+  }
+}

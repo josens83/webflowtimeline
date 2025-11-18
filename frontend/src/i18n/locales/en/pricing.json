@@ -1,0 +1,21 @@
+{
+  "title": "Simple, Transparent Pricing",
+  "subtitle": "Cancel anytime, money-back guarantee",
+  "free": {
+    "name": "Free",
+    "price": "$0",
+    "period": "Forever free",
+    "cta": "Start for Free"
+  },
+  "premium": {
+    "name": "Premium",
+    "price": "$9.99",
+    "period": "month",
+    "cta": "Start Premium",
+    "badge": "Popular",
+    "current": "Currently subscribed"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions"
+  }
+}

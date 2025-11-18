@@ -1,11 +1,12 @@
 /**
  * Modal Component
  * Atomic Design - Molecule
- * 모달 다이얼로그 컴포넌트
+ * 모달 다이얼로그 컴포넌트 (Focus Trap 포함)
  */
 
 import { HTMLAttributes, useEffect } from 'react';
 import { X } from 'lucide-react';
+import FocusTrap from 'focus-trap-react';
 
 export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
   /** 모달 표시 여부 */
@@ -86,45 +87,56 @@ export function Modal({
   const sizeClass = sizeClasses[size];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-        onClick={closeOnOverlayClick ? onClose : undefined}
-      />
-
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
+    <FocusTrap
+      focusTrapOptions={{
+        initialFocus: false,
+        allowOutsideClick: true,
+        escapeDeactivates: false, // We handle ESC ourselves
+      }}
+    >
+      <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+        {/* Backdrop */}
         <div
-          className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full ${sizeClass} ${className}`.trim()}
-          onClick={(e) => e.stopPropagation()}
-          {...props}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            {title && (
-              <h2 className="text-xl font-semibold">{title}</h2>
-            )}
-            <button
-              onClick={onClose}
-              className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
-              aria-label="닫기"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+          onClick={closeOnOverlayClick ? onClose : undefined}
+          aria-hidden="true"
+        />
 
-          {/* Body */}
-          <div className="p-6">{children}</div>
-
-          {/* Footer */}
-          {footer && (
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
-              {footer}
+        {/* Modal */}
+        <div className="flex min-h-full items-center justify-center p-4">
+          <div
+            className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full ${sizeClass} ${className}`.trim()}
+            onClick={(e) => e.stopPropagation()}
+            {...props}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              {title && (
+                <h2 id="modal-title" className="text-xl font-semibold">
+                  {title}
+                </h2>
+              )}
+              <button
+                onClick={onClose}
+                className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-1"
+                aria-label="닫기"
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
-          )}
+
+            {/* Body */}
+            <div className="p-6">{children}</div>
+
+            {/* Footer */}
+            {footer && (
+              <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                {footer}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </FocusTrap>
   );
 }
