@@ -1,11 +1,18 @@
+/**
+ * Core Application Types
+ * 애플리케이션 전역 타입 정의
+ */
+
+// User (Full profile from /profile endpoint)
 export interface User {
   id: number;
   email: string;
   name: string;
   subscription_status: 'free' | 'premium';
-  created_at: string;
+  created_at?: string; // Optional: only available from profile endpoint
 }
 
+// Website
 export interface Website {
   name: string;
   url: string;
@@ -15,6 +22,7 @@ export interface Website {
   category: string;
 }
 
+// Trend Data
 export interface TrendData {
   id: number;
   decade: '1990s' | '2000s' | '2010s' | '2020s';
@@ -30,15 +38,20 @@ export interface TrendData {
   created_at: string;
 }
 
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
-  checkAuth: () => void;
-}
-
+// Type Aliases
 export type Decade = '1990s' | '2000s' | '2010s' | '2020s';
 export type Country = 'korea' | 'usa' | 'japan' | 'china';
+export type SubscriptionStatus = 'free' | 'premium';
+
+// Re-export API types for convenience
+export type {
+  AuthResponse,
+  ProfileResponse,
+  RefreshTokenResponse,
+  TrendsResponse,
+  ComparisonResponse,
+  CheckoutSessionResponse,
+  PortalSessionResponse,
+  ContactResponse,
+  ApiError,
+} from './api.types';

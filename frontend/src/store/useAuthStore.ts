@@ -1,62 +1,162 @@
 import { create } from 'zustand';
-import type { AuthState } from '../types';
 import { authAPI } from '../services/api';
-import { toast } from 'react-toastify';
+import { tokenManager } from '../utils/tokenManager';
+import { showErrorToast, showSuccessToast, showInfoToast } from '../utils/errorHandler';
+import type { User } from '../types';
 
+/**
+ * Auth Store 인터페이스
+ */
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
+  refreshToken: () => Promise<void>;
+}
+
+/**
+ * Auth Store
+ * 인증 상태 관리
+ */
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: !!localStorage.getItem('token'),
+  isAuthenticated: tokenManager.hasTokens(),
+  isLoading: false,
 
+  /**
+   * 로그인
+   */
   login: async (email: string, password: string) => {
+    set({ isLoading: true });
+
     try {
       const response = await authAPI.login(email, password);
-      const { token, user } = response.data;
+      const { accessToken, refreshToken, user } = response.data;
 
-      localStorage.setItem('token', token);
-      set({ user, token, isAuthenticated: true });
+      // 토큰 저장
+      tokenManager.setTokens(accessToken, refreshToken);
 
-      toast.success('로그인 성공!');
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || '로그인 실패');
+      // 상태 업데이트
+      set({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      showSuccessToast('로그인 성공!');
+    } catch (error) {
+      set({ isLoading: false });
+      showErrorToast(error);
       throw error;
     }
   },
 
+  /**
+   * 회원가입
+   */
   register: async (email: string, password: string, name: string) => {
+    set({ isLoading: true });
+
     try {
       const response = await authAPI.register(email, password, name);
-      const { token, user } = response.data;
+      const { accessToken, refreshToken, user } = response.data;
 
-      localStorage.setItem('token', token);
-      set({ user, token, isAuthenticated: true });
+      // 토큰 저장
+      tokenManager.setTokens(accessToken, refreshToken);
 
-      toast.success('회원가입 성공!');
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || '회원가입 실패');
+      // 상태 업데이트
+      set({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      showSuccessToast('회원가입 성공!');
+    } catch (error) {
+      set({ isLoading: false });
+      showErrorToast(error);
       throw error;
     }
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    set({ user: null, token: null, isAuthenticated: false });
-    toast.info('로그아웃되었습니다');
+  /**
+   * 로그아웃
+   */
+  logout: async () => {
+    try {
+      const refreshToken = tokenManager.getRefreshToken();
+
+      // 서버에 로그아웃 요청 (토큰 무효화)
+      if (refreshToken) {
+        await authAPI.logout(refreshToken);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // 로컬 상태 초기화
+      tokenManager.clearTokens();
+      set({
+        user: null,
+        isAuthenticated: false,
+      });
+
+      showInfoToast('로그아웃되었습니다');
+    }
   },
 
+  /**
+   * 인증 상태 확인
+   */
   checkAuth: async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      set({ user: null, token: null, isAuthenticated: false });
+    if (!tokenManager.hasTokens()) {
+      set({ user: null, isAuthenticated: false });
       return;
     }
 
     try {
       const response = await authAPI.getProfile();
-      set({ user: response.data, token, isAuthenticated: true });
+      set({
+        user: response.data,
+        isAuthenticated: true,
+      });
     } catch (error) {
-      localStorage.removeItem('token');
-      set({ user: null, token: null, isAuthenticated: false });
+      // 인증 실패 시 토큰 삭제
+      tokenManager.clearTokens();
+      set({
+        user: null,
+        isAuthenticated: false,
+      });
+    }
+  },
+
+  /**
+   * 토큰 수동 갱신
+   */
+  refreshToken: async () => {
+    const refreshToken = tokenManager.getRefreshToken();
+
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    try {
+      const response = await authAPI.refreshToken(refreshToken);
+      const { accessToken } = response.data;
+
+      // 새 Access Token 저장
+      tokenManager.setAccessToken(accessToken);
+    } catch (error) {
+      // 토큰 갱신 실패 시 로그아웃
+      tokenManager.clearTokens();
+      set({
+        user: null,
+        isAuthenticated: false,
+      });
+      throw error;
     }
   },
 }));

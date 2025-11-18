@@ -60,7 +60,9 @@ export default function AccountPage() {
                 <div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">가입일</div>
                   <div className="font-semibold">
-                    {new Date(user.created_at).toLocaleDateString('ko-KR')}
+                    {user.created_at
+                      ? new Date(user.created_at).toLocaleDateString('ko-KR')
+                      : '-'}
                   </div>
                 </div>
               </div>
