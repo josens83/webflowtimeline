@@ -1,30 +1,24 @@
-import { useEffect, useState } from 'react';
+/**
+ * TimelinePage - Web Trends Timeline
+ * Phase 19 리팩토링: Atomic Design 패턴 적용
+ */
+
+import { useEffect, useState, useCallback } from 'react';
 import { trendsAPI } from '../services/api';
 import { TrendData, Decade, Country } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Globe, Code, Users, TrendingUp, Search, FileQuestion } from 'lucide-react';
+import { Search, FileQuestion } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/useAuthStore';
-import { Link } from 'react-router-dom';
 import ExportButton from '../components/ExportButton';
-import ShareButton from '../components/ShareButton';
 import TimelineChart from '../components/TimelineChart';
 import { TimelinePageSkeleton } from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
-
-const DECADES: { value: Decade; label: string; color: string }[] = [
-  { value: '1990s', label: '1990년대', color: 'from-blue-500 to-cyan-500' },
-  { value: '2000s', label: '2000년대', color: 'from-purple-500 to-pink-500' },
-  { value: '2010s', label: '2010년대', color: 'from-orange-500 to-red-500' },
-  { value: '2020s', label: '2020년대', color: 'from-green-500 to-teal-500' },
-];
-
-const COUNTRIES: { value: Country; label: string; flag: string }[] = [
-  { value: 'korea', label: '한국', flag: '🇰🇷' },
-  { value: 'usa', label: '미국', flag: '🇺🇸' },
-  { value: 'japan', label: '일본', flag: '🇯🇵' },
-  { value: 'china', label: '중국', flag: '🇨🇳' },
-];
+import { SearchInput } from '../components/molecules/SearchInput';
+import { FilterButton } from '../components/molecules/FilterButton';
+import { TrendCard } from '../components/organisms/TrendCard';
+import { useDebounce } from '../hooks/useDebounce';
+import { DECADES_CONFIG, COUNTRIES_CONFIG } from '../config/constants';
 
 export default function TimelinePage() {
   const [trends, setTrends] = useState<TrendData[]>([]);
@@ -36,6 +30,7 @@ export default function TimelinePage() {
   const { user } = useAuthStore();
 
   const isPremium = user?.subscription_status === 'premium';
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
     loadTrends();
@@ -43,7 +38,7 @@ export default function TimelinePage() {
 
   useEffect(() => {
     filterTrends();
-  }, [trends, searchQuery]);
+  }, [trends, debouncedSearchQuery]);
 
   const loadTrends = async () => {
     setIsLoading(true);
@@ -62,13 +57,13 @@ export default function TimelinePage() {
     }
   };
 
-  const filterTrends = () => {
-    if (!searchQuery.trim()) {
+  const filterTrends = useCallback(() => {
+    if (!debouncedSearchQuery.trim()) {
       setFilteredTrends(trends);
       return;
     }
 
-    const query = searchQuery.toLowerCase();
+    const query = debouncedSearchQuery.toLowerCase();
     const filtered = trends.filter(trend => {
       return (
         trend.title.toLowerCase().includes(query) ||
@@ -80,15 +75,34 @@ export default function TimelinePage() {
     });
 
     setFilteredTrends(filtered);
-  };
+  }, [trends, debouncedSearchQuery]);
 
-  const handleCountryFilter = (country: Country) => {
+  const handleDecadeChange = useCallback((decade: Decade) => {
+    setSelectedDecade(decade);
+    setSelectedCountry(null);
+  }, []);
+
+  const handleCountryFilter = useCallback((country: Country) => {
     if (selectedCountry === country) {
       setSelectedCountry(null);
     } else {
       setSelectedCountry(country);
     }
-  };
+  }, [selectedCountry]);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleResetSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
+
+  const handleResetAll = useCallback(() => {
+    setSearchQuery('');
+    setSelectedCountry(null);
+    setSelectedDecade('2020s');
+  }, []);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] py-8 px-4">
@@ -103,14 +117,11 @@ export default function TimelinePage() {
 
         {/* Search and Export */}
         <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-between">
-          <div className="relative flex-1 w-full md:max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="웹사이트, 기술, 트렌드 검색..."
+          <div className="flex-1 w-full md:max-w-md">
+            <SearchInput
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+              onChange={handleSearchChange}
+              placeholder="웹사이트, 기술, 트렌드 검색..."
             />
           </div>
           <ExportButton data={filteredTrends} filename="web-trends-timeline" />
@@ -119,21 +130,15 @@ export default function TimelinePage() {
         {/* Decade Selector */}
         <div className="mb-8">
           <div className="flex flex-wrap justify-center gap-4">
-            {DECADES.map((decade) => (
-              <button
+            {DECADES_CONFIG.map((decade) => (
+              <FilterButton
                 key={decade.value}
-                onClick={() => {
-                  setSelectedDecade(decade.value);
-                  setSelectedCountry(null);
-                }}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 ${
-                  selectedDecade === decade.value
-                    ? `bg-gradient-to-r ${decade.color} text-white shadow-lg`
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
-                }`}
+                onClick={() => handleDecadeChange(decade.value)}
+                isActive={selectedDecade === decade.value}
+                activeGradient={decade.color}
               >
                 {decade.label}
-              </button>
+              </FilterButton>
             ))}
           </div>
         </div>
@@ -142,19 +147,15 @@ export default function TimelinePage() {
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4 text-center">국가별 필터</h3>
           <div className="flex flex-wrap justify-center gap-3">
-            {COUNTRIES.map((country) => (
-              <button
+            {COUNTRIES_CONFIG.map((country) => (
+              <FilterButton
                 key={country.value}
                 onClick={() => handleCountryFilter(country.value)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  selectedCountry === country.value
-                    ? 'bg-primary-600 text-white shadow-lg'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
-                }`}
+                isActive={selectedCountry === country.value}
+                icon={<span className="text-xl">{country.flag}</span>}
               >
-                <span className="mr-2">{country.flag}</span>
                 {country.label}
-              </button>
+              </FilterButton>
             ))}
           </div>
         </div>
@@ -204,16 +205,12 @@ export default function TimelinePage() {
               searchQuery
                 ? {
                     label: '검색 초기화',
-                    onClick: () => setSearchQuery(''),
+                    onClick: handleResetSearch,
                     variant: 'secondary' as const
                   }
                 : {
                     label: '전체 타임라인 보기',
-                    onClick: () => {
-                      setSearchQuery('');
-                      setSelectedCountry(null);
-                      setSelectedDecade('2020s');
-                    },
+                    onClick: handleResetAll,
                     variant: 'primary' as const
                   }
             }
@@ -221,163 +218,5 @@ export default function TimelinePage() {
         )}
       </div>
     </div>
-  );
-}
-
-interface TrendCardProps {
-  trend: TrendData;
-  index: number;
-  isPremium: boolean;
-}
-
-function TrendCard({ trend, index, isPremium }: TrendCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const isLocked = trend.is_premium && !isPremium;
-
-  const countryEmoji = {
-    korea: '🇰🇷',
-    usa: '🇺🇸',
-    japan: '🇯🇵',
-    china: '🇨🇳',
-  }[trend.country];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className={`card relative ${isLocked ? 'opacity-75' : ''}`}
-    >
-      {isLocked && (
-        <div className="absolute inset-0 backdrop-blur-sm bg-white/50 dark:bg-gray-900/50 rounded-xl flex items-center justify-center z-10">
-          <div className="text-center p-6">
-            <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-lg font-semibold mb-2">프리미엄 전용</p>
-            <Link to="/pricing" className="btn-primary inline-block">
-              업그레이드
-            </Link>
-          </div>
-        </div>
-      )}
-
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-2xl font-bold mb-1">
-            <span className="mr-2">{countryEmoji}</span>
-            {trend.title}
-          </h3>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {trend.decade}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {!isLocked && <ShareButton trend={trend} />}
-          {trend.is_premium && (
-            <span className="premium-badge">Premium</span>
-          )}
-        </div>
-      </div>
-
-      <p className="text-gray-700 dark:text-gray-300 mb-4">
-        {trend.description}
-      </p>
-
-      {!isLocked && (
-        <>
-          {/* Websites */}
-          <div className="mb-4">
-            <div className="flex items-center mb-2">
-              <Globe className="w-5 h-5 mr-2 text-primary-600" />
-              <h4 className="font-semibold">주요 웹사이트</h4>
-            </div>
-            <div className="space-y-2">
-              {trend.websites.slice(0, isExpanded ? undefined : 3).map((site, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold">{site.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {site.description}
-                      </div>
-                    </div>
-                    <span className="text-xs bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-2 py-1 rounded">
-                      {site.category}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Design Trends */}
-          <div className="mb-4">
-            <div className="flex items-center mb-2">
-              <Code className="w-5 h-5 mr-2 text-purple-600" />
-              <h4 className="font-semibold">디자인 트렌드</h4>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {trend.design_trends.map((dt, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm"
-                >
-                  {dt}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {isExpanded && (
-            <>
-              {/* Tech Stack */}
-              <div className="mb-4">
-                <div className="flex items-center mb-2">
-                  <TrendingUp className="w-5 h-5 mr-2 text-orange-600" />
-                  <h4 className="font-semibold">기술 스택</h4>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {trend.tech_stack.map((tech, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-full text-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* User Behavior */}
-              <div className="mb-4">
-                <div className="flex items-center mb-2">
-                  <Users className="w-5 h-5 mr-2 text-green-600" />
-                  <h4 className="font-semibold">사용자 행동</h4>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {trend.user_behavior.map((behavior, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm"
-                    >
-                      {behavior}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-4 text-primary-600 dark:text-primary-400 font-semibold hover:underline"
-          >
-            {isExpanded ? '접기' : '더 보기'}
-          </button>
-        </>
-      )}
-    </motion.div>
   );
 }

@@ -8,3 +8,5 @@ export * from './Card';
 export * from './Alert';
 export * from './Modal';
 export * from './LoadingFallback';
+export * from './SearchInput';
+export * from './FilterButton';

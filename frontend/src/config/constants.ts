@@ -73,6 +73,28 @@ export const DECADE_LABELS: Record<string, string> = {
   '2020s': '2020년대',
 };
 
+// Timeline Filter Configuration
+export const DECADES_CONFIG = [
+  { value: '1990s' as const, label: '1990년대', color: 'from-blue-500 to-cyan-500' },
+  { value: '2000s' as const, label: '2000년대', color: 'from-purple-500 to-pink-500' },
+  { value: '2010s' as const, label: '2010년대', color: 'from-orange-500 to-red-500' },
+  { value: '2020s' as const, label: '2020년대', color: 'from-green-500 to-teal-500' },
+] as const;
+
+export const COUNTRIES_CONFIG = [
+  { value: 'korea' as const, label: '한국', flag: '🇰🇷' },
+  { value: 'usa' as const, label: '미국', flag: '🇺🇸' },
+  { value: 'japan' as const, label: '일본', flag: '🇯🇵' },
+  { value: 'china' as const, label: '중국', flag: '🇨🇳' },
+] as const;
+
+export const COUNTRY_EMOJIS: Record<string, string> = {
+  korea: '🇰🇷',
+  usa: '🇺🇸',
+  japan: '🇯🇵',
+  china: '🇨🇳',
+};
+
 // Routes
 export const ROUTES = {
   HOME: '/',

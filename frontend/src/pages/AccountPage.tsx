@@ -1,8 +1,16 @@
+/**
+ * AccountPage - User Account Management
+ * Phase 19 리팩토링: Atomic Design 패턴 적용
+ */
+
 import { useAuthStore } from '../store/useAuthStore';
 import { Crown, Calendar, Mail, User as UserIcon, CreditCard } from 'lucide-react';
 import { stripeAPI } from '../services/api';
 import { toast } from 'react-toastify';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { Card } from '../components/molecules/Card';
+import { Button } from '../components/atoms/Button';
+import { Link } from 'react-router-dom';
 
 export default function AccountPage() {
   const { user } = useAuthStore();
@@ -10,7 +18,7 @@ export default function AccountPage() {
 
   const isPremium = user?.subscription_status === 'premium';
 
-  const handleManageSubscription = async () => {
+  const handleManageSubscription = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await stripeAPI.createPortalSession();
@@ -22,7 +30,7 @@ export default function AccountPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   if (!user) {
     return null;
@@ -35,7 +43,7 @@ export default function AccountPage() {
 
         <div className="grid gap-6">
           {/* Profile Card */}
-          <div className="card">
+          <Card variant="default" padding="lg">
             <h2 className="text-2xl font-bold mb-6">프로필 정보</h2>
 
             <div className="space-y-4">
@@ -67,10 +75,10 @@ export default function AccountPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Subscription Card */}
-          <div className="card">
+          <Card variant="default" padding="lg">
             <h2 className="text-2xl font-bold mb-6">구독 정보</h2>
 
             <div className="mb-6">
@@ -115,14 +123,17 @@ export default function AccountPage() {
                     </ul>
                   </div>
 
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    fullWidth
                     onClick={handleManageSubscription}
-                    disabled={isLoading}
-                    className="w-full flex items-center justify-center px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-semibold transition disabled:opacity-50"
+                    isLoading={isLoading}
+                    loadingText="처리 중..."
+                    leftIcon={<CreditCard className="w-5 h-5" />}
                   >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    {isLoading ? '처리 중...' : '구독 관리'}
-                  </button>
+                    구독 관리
+                  </Button>
 
                   <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
                     결제 정보 수정, 구독 취소 등을 할 수 있습니다
@@ -143,19 +154,18 @@ export default function AccountPage() {
                     </ul>
                   </div>
 
-                  <a
-                    href="/pricing"
-                    className="block w-full text-center btn-primary"
-                  >
-                    프리미엄 시작하기 - $9.99/월
-                  </a>
+                  <Link to="/pricing" className="block">
+                    <Button variant="primary" size="lg" fullWidth>
+                      프리미엄 시작하기 - $9.99/월
+                    </Button>
+                  </Link>
                 </>
               )}
             </div>
-          </div>
+          </Card>
 
           {/* Usage Stats */}
-          <div className="card">
+          <Card variant="default" padding="lg">
             <h2 className="text-2xl font-bold mb-6">이용 통계</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -186,7 +196,7 @@ export default function AccountPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

@@ -1,4 +1,9 @@
-import { useEffect, useState } from 'react';
+/**
+ * ComparePage - Country Comparison
+ * Phase 19 리팩토링: Atomic Design 패턴 적용
+ */
+
+import { useEffect, useState, useCallback } from 'react';
 import { trendsAPI } from '../services/api';
 import { TrendData, Decade, Country } from '../types';
 import { motion } from 'framer-motion';
@@ -9,9 +14,16 @@ import { Lock, Globe, Code, TrendingUp } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ExportButton from '../components/ExportButton';
 import { ComparePageSkeleton } from '../components/LoadingSkeleton';
+import { Card } from '../components/molecules/Card';
+import { Button } from '../components/atoms/Button';
+import { FilterButton } from '../components/molecules/FilterButton';
+import { Tag } from '../components/atoms/Tag';
+import { COUNTRIES_CONFIG } from '../config/constants';
 
 const DECADES: Decade[] = ['1990s', '2000s', '2010s', '2020s'];
-const COUNTRIES: { value: Country; label: string; flag: string; color: string }[] = [
+
+// Extended countries with color for charts
+const COUNTRIES_WITH_COLOR: { value: Country; label: string; flag: string; color: string }[] = [
   { value: 'korea', label: '한국', flag: '🇰🇷', color: '#3b82f6' },
   { value: 'usa', label: '미국', flag: '🇺🇸', color: '#ef4444' },
   { value: 'japan', label: '일본', flag: '🇯🇵', color: '#8b5cf6' },
@@ -50,37 +62,47 @@ export default function ComparePage() {
     }
   };
 
-  const toggleCountry = (country: Country) => {
-    if (selectedCountries.includes(country)) {
-      if (selectedCountries.length > 1) {
-        setSelectedCountries(selectedCountries.filter(c => c !== country));
+  const toggleCountry = useCallback((country: Country) => {
+    setSelectedCountries(prev => {
+      if (prev.includes(country)) {
+        if (prev.length > 1) {
+          return prev.filter(c => c !== country);
+        } else {
+          toast.info('최소 1개 국가는 선택되어야 합니다');
+          return prev;
+        }
       } else {
-        toast.info('최소 1개 국가는 선택되어야 합니다');
+        if (prev.length < 4) {
+          return [...prev, country];
+        } else {
+          toast.info('최대 4개 국가까지 선택 가능합니다');
+          return prev;
+        }
       }
-    } else {
-      if (selectedCountries.length < 4) {
-        setSelectedCountries([...selectedCountries, country]);
-      } else {
-        toast.info('최대 4개 국가까지 선택 가능합니다');
-      }
-    }
-  };
+    });
+  }, []);
+
+  const handleDecadeChange = useCallback((decade: Decade) => {
+    setSelectedDecade(decade);
+  }, []);
 
   if (!isPremium) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
-          <div className="card">
+          <Card variant="elevated" padding="lg">
             <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">프리미엄 전용 기능</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               비교 분석 기능은 프리미엄 회원만 이용할 수 있습니다.
               전체 국가의 트렌드를 비교하고 심층 분석 인사이트를 얻으세요.
             </p>
-            <Link to="/pricing" className="btn-primary inline-block">
-              프리미엄 업그레이드 - $9.99/월
+            <Link to="/pricing">
+              <Button variant="primary" size="lg">
+                프리미엄 업그레이드 - $9.99/월
+              </Button>
             </Link>
-          </div>
+          </Card>
         </div>
       </div>
     );
@@ -88,15 +110,15 @@ export default function ComparePage() {
 
   // Prepare chart data
   const websiteCountData = comparisonData.map(trend => ({
-    country: COUNTRIES.find(c => c.value === trend.country)?.label,
+    country: COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.label,
     websites: trend.websites.length,
-    fill: COUNTRIES.find(c => c.value === trend.country)?.color
+    fill: COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.color
   }));
 
   const techStackData = comparisonData.map(trend => ({
-    country: COUNTRIES.find(c => c.value === trend.country)?.label,
+    country: COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.label,
     technologies: trend.tech_stack.length,
-    fill: COUNTRIES.find(c => c.value === trend.country)?.color
+    fill: COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.color
   }));
 
   // Radar chart data
@@ -105,28 +127,28 @@ export default function ComparePage() {
       metric: '웹사이트 수',
       ...comparisonData.reduce((acc, trend) => ({
         ...acc,
-        [COUNTRIES.find(c => c.value === trend.country)?.label || '']: trend.websites.length
+        [COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.label || '']: trend.websites.length
       }), {})
     },
     {
       metric: '디자인 트렌드',
       ...comparisonData.reduce((acc, trend) => ({
         ...acc,
-        [COUNTRIES.find(c => c.value === trend.country)?.label || '']: trend.design_trends.length
+        [COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.label || '']: trend.design_trends.length
       }), {})
     },
     {
       metric: '기술 스택',
       ...comparisonData.reduce((acc, trend) => ({
         ...acc,
-        [COUNTRIES.find(c => c.value === trend.country)?.label || '']: trend.tech_stack.length
+        [COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.label || '']: trend.tech_stack.length
       }), {})
     },
     {
       metric: '사용자 행동',
       ...comparisonData.reduce((acc, trend) => ({
         ...acc,
-        [COUNTRIES.find(c => c.value === trend.country)?.label || '']: trend.user_behavior.length
+        [COUNTRIES_WITH_COLOR.find(c => c.value === trend.country)?.label || '']: trend.user_behavior.length
       }), {})
     }
   ];
@@ -157,17 +179,13 @@ export default function ComparePage() {
             <h3 className="text-lg font-semibold mb-3">시대 선택</h3>
             <div className="flex flex-wrap gap-3">
               {DECADES.map((decade) => (
-                <button
+                <FilterButton
                   key={decade}
-                  onClick={() => setSelectedDecade(decade)}
-                  className={`px-6 py-2 rounded-lg font-semibold transition ${
-                    selectedDecade === decade
-                      ? 'bg-primary-600 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
-                  }`}
+                  onClick={() => handleDecadeChange(decade)}
+                  isActive={selectedDecade === decade}
                 >
                   {decade}
-                </button>
+                </FilterButton>
               ))}
             </div>
           </div>
@@ -178,19 +196,15 @@ export default function ComparePage() {
               비교할 국가 선택 ({selectedCountries.length}/4)
             </h3>
             <div className="flex flex-wrap gap-3">
-              {COUNTRIES.map((country) => (
-                <button
+              {COUNTRIES_CONFIG.map((country) => (
+                <FilterButton
                   key={country.value}
                   onClick={() => toggleCountry(country.value)}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
-                    selectedCountries.includes(country.value)
-                      ? 'bg-primary-600 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
-                  }`}
+                  isActive={selectedCountries.includes(country.value)}
+                  icon={<span className="text-xl">{country.flag}</span>}
                 >
-                  <span className="mr-2">{country.flag}</span>
                   {country.label}
-                </button>
+                </FilterButton>
               ))}
             </div>
           </div>
@@ -205,33 +219,34 @@ export default function ComparePage() {
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {comparisonData.map((trend, index) => {
-                const country = COUNTRIES.find(c => c.value === trend.country);
+                const country = COUNTRIES_WITH_COLOR.find(c => c.value === trend.country);
                 return (
                   <motion.div
                     key={trend.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="card"
                   >
-                    <div className="text-center">
-                      <div className="text-4xl mb-2">{country?.flag}</div>
-                      <h3 className="text-xl font-bold mb-2">{country?.label}</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">웹사이트:</span>
-                          <span className="font-semibold">{trend.websites.length}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">기술:</span>
-                          <span className="font-semibold">{trend.tech_stack.length}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">트렌드:</span>
-                          <span className="font-semibold">{trend.design_trends.length}</span>
+                    <Card variant="default" padding="md">
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">{country?.flag}</div>
+                        <h3 className="text-xl font-bold mb-2">{country?.label}</h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">웹사이트:</span>
+                            <span className="font-semibold">{trend.websites.length}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">기술:</span>
+                            <span className="font-semibold">{trend.tech_stack.length}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">트렌드:</span>
+                            <span className="font-semibold">{trend.design_trends.length}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Card>
                   </motion.div>
                 );
               })}
@@ -240,7 +255,7 @@ export default function ComparePage() {
             {/* Bar Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Websites Count */}
-              <div className="card">
+              <Card variant="default" padding="md">
                 <h3 className="text-xl font-bold mb-4 flex items-center">
                   <Globe className="w-5 h-5 mr-2 text-primary-600" />
                   주요 웹사이트 수
@@ -254,10 +269,10 @@ export default function ComparePage() {
                     <Bar dataKey="websites" fill="#3b82f6" />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
+              </Card>
 
               {/* Tech Stack Count */}
-              <div className="card">
+              <Card variant="default" padding="md">
                 <h3 className="text-xl font-bold mb-4 flex items-center">
                   <Code className="w-5 h-5 mr-2 text-purple-600" />
                   기술 스택 수
@@ -271,11 +286,11 @@ export default function ComparePage() {
                     <Bar dataKey="technologies" fill="#8b5cf6" />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
+              </Card>
             </div>
 
             {/* Radar Chart */}
-            <div className="card">
+            <Card variant="default" padding="md">
               <h3 className="text-xl font-bold mb-4 flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-orange-600" />
                 종합 비교
@@ -286,7 +301,7 @@ export default function ComparePage() {
                   <PolarAngleAxis dataKey="metric" />
                   <PolarRadiusAxis />
                   {selectedCountries.map((countryValue) => {
-                    const country = COUNTRIES.find(c => c.value === countryValue);
+                    const country = COUNTRIES_WITH_COLOR.find(c => c.value === countryValue);
                     if (!country) return null;
                     return (
                       <Radar
@@ -302,10 +317,10 @@ export default function ComparePage() {
                   <Legend />
                 </RadarChart>
               </ResponsiveContainer>
-            </div>
+            </Card>
 
             {/* Detailed Comparison Table */}
-            <div className="card overflow-x-auto">
+            <Card variant="default" padding="md" className="overflow-x-auto">
               <h3 className="text-xl font-bold mb-4">상세 비교</h3>
               <table className="w-full">
                 <thead>
@@ -318,7 +333,7 @@ export default function ComparePage() {
                 </thead>
                 <tbody>
                   {comparisonData.map((trend) => {
-                    const country = COUNTRIES.find(c => c.value === trend.country);
+                    const country = COUNTRIES_WITH_COLOR.find(c => c.value === trend.country);
                     return (
                       <tr key={trend.id} className="border-b dark:border-gray-700">
                         <td className="py-3 px-4">
@@ -335,18 +350,14 @@ export default function ComparePage() {
                         <td className="py-3 px-4">
                           <div className="flex flex-wrap gap-1">
                             {trend.design_trends.slice(0, 3).map((dt, idx) => (
-                              <span key={idx} className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900 rounded">
-                                {dt}
-                              </span>
+                              <Tag key={idx} color="purple">{dt}</Tag>
                             ))}
                           </div>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex flex-wrap gap-1">
                             {trend.tech_stack.slice(0, 3).map((tech, idx) => (
-                              <span key={idx} className="text-xs px-2 py-1 bg-orange-100 dark:bg-orange-900 rounded">
-                                {tech}
-                              </span>
+                              <Tag key={idx} color="orange">{tech}</Tag>
                             ))}
                           </div>
                         </td>
@@ -355,7 +366,7 @@ export default function ComparePage() {
                   })}
                 </tbody>
               </table>
-            </div>
+            </Card>
           </div>
         )}
       </div>

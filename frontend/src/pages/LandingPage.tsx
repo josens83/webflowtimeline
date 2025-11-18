@@ -1,6 +1,12 @@
+/**
+ * LandingPage - Homepage
+ * Phase 19 리팩토링: Button 컴포넌트 적용
+ */
+
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { TrendingUp, Globe, BarChart3, Zap, Lock, Download, Sparkles, ArrowRight } from 'lucide-react';
+import { Button } from '../components/atoms/Button';
 
 export default function LandingPage() {
   const features = [
@@ -88,18 +94,24 @@ export default function LandingPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                to="/register"
-                className="group relative px-8 py-4 bg-primary hover:bg-primary-hover text-text-inverse font-semibold text-lg rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 flex items-center gap-2"
-              >
-                무료로 시작하기
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/register">
+                <Button
+                  variant="primary"
+                  size="xl"
+                  rightIcon={<ArrowRight className="w-5 h-5" />}
+                  className="hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30"
+                >
+                  무료로 시작하기
+                </Button>
               </Link>
-              <Link
-                to="/timeline"
-                className="px-8 py-4 bg-surface hover:bg-surface-hover border border-border-default text-text-primary font-semibold text-lg rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-              >
-                타임라인 보기
+              <Link to="/timeline">
+                <Button
+                  variant="outline"
+                  size="xl"
+                  className="hover:-translate-y-0.5"
+                >
+                  타임라인 보기
+                </Button>
               </Link>
             </div>
 
@@ -260,18 +272,24 @@ export default function LandingPage() {
                 프리미엄으로 업그레이드하면 모든 기능을 이용할 수 있습니다.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/register"
-                  className="group px-8 py-4 bg-primary hover:bg-primary-hover text-text-inverse font-semibold text-lg rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 inline-flex items-center justify-center gap-2"
-                >
-                  무료로 시작하기
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Link to="/register">
+                  <Button
+                    variant="primary"
+                    size="xl"
+                    rightIcon={<ArrowRight className="w-5 h-5" />}
+                    className="hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30"
+                  >
+                    무료로 시작하기
+                  </Button>
                 </Link>
-                <Link
-                  to="/pricing"
-                  className="px-8 py-4 bg-surface hover:bg-surface-hover border border-border-default text-text-primary font-semibold text-lg rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  요금제 보기
+                <Link to="/pricing">
+                  <Button
+                    variant="outline"
+                    size="xl"
+                    className="hover:-translate-y-0.5"
+                  >
+                    요금제 보기
+                  </Button>
                 </Link>
               </div>
 
