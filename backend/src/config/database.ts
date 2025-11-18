@@ -26,7 +26,16 @@ function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `, (err) => {
+    if (err) console.error('Users table creation error:', err);
+    else {
+      // Create indexes for users table
+      db.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_users_subscription ON users(subscription_status)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at)');
+    }
+  });
 
   // Trends data table
   db.run(`
@@ -44,7 +53,16 @@ function initDatabase() {
       is_premium INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `, (err) => {
+    if (err) console.error('Trends table creation error:', err);
+    else {
+      // Create indexes for trends table
+      db.run('CREATE INDEX IF NOT EXISTS idx_trends_decade ON trends(decade)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_trends_country ON trends(country)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_trends_is_premium ON trends(is_premium)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_trends_decade_country ON trends(decade, country)');
+    }
+  });
 
   // Contacts table for customer inquiries
   db.run(`
@@ -59,11 +77,74 @@ function initDatabase() {
       admin_reply TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
     )
-  `);
+  `, (err) => {
+    if (err) console.error('Contacts table creation error:', err);
+    else {
+      // Create indexes for contacts table
+      db.run('CREATE INDEX IF NOT EXISTS idx_contacts_status ON contacts(status)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_contacts_user_id ON contacts(user_id)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_contacts_created_at ON contacts(created_at)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)');
+    }
+  });
 
-  console.log('Database tables initialized');
+  // Sessions table for better auth management
+  db.run(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      token_hash TEXT NOT NULL,
+      ip_address TEXT,
+      user_agent TEXT,
+      expires_at DATETIME NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+    if (err) console.error('Sessions table creation error:', err);
+    else {
+      db.run('CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_sessions_token_hash ON sessions(token_hash)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)');
+    }
+  });
+
+  // Activity logs for monitoring
+  db.run(`
+    CREATE TABLE IF NOT EXISTS activity_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      action TEXT NOT NULL,
+      resource TEXT,
+      details TEXT,
+      ip_address TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    )
+  `, (err) => {
+    if (err) console.error('Activity logs table creation error:', err);
+    else {
+      db.run('CREATE INDEX IF NOT EXISTS idx_activity_user_id ON activity_logs(user_id)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_logs(action)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_activity_created_at ON activity_logs(created_at)');
+    }
+  });
+
+  console.log('✅ Database tables initialized with indexes');
 }
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  db.close((err) => {
+    if (err) {
+      console.error('Error closing database:', err);
+    } else {
+      console.log('Database connection closed');
+    }
+    process.exit(0);
+  });
+});
 
 export default db;
